@@ -1,5 +1,5 @@
 import numpy as np
-from neuralnet import NeuralNetwork
+from neural_network import NeuralNetwork
 
 teach_inputs = [
     np.matrix([0, 0]),

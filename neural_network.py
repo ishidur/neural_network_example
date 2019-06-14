@@ -2,6 +2,7 @@
 # Ref: https://qiita.com/haltaro/items/7639208417a751ad9bab
 ############################################################
 import numpy as np
+from typing import List
 from activation_funcs import sigmoid as activation_func
 from activation_funcs import differential_sigmoid as differential_activation_func
 
@@ -12,7 +13,19 @@ class NeuralNetwork:
     outputs = []
     learning_rate = 1.0
 
-    def __init__(self, structure, init_val, learning_rate):
+    def __init__(self, structure: List[int], init_val: float, learning_rate: float):
+        """
+        初期化
+
+        Parameters
+        ----------
+        structure : List[int]
+            ニューラルネットワークの構造．
+        init_val : float
+            重み，しきい値の初期値の取りうる値の範囲．[-init_val, init_val]
+        learning_rate : float
+            重み，しきい値の学習係数
+        """
         self.learning_rate = learning_rate
         for i in range(len(structure) - 1):
             self.weights.append(
@@ -27,6 +40,14 @@ class NeuralNetwork:
             )
 
     def forward_propagate(self, inputs):
+        """
+        順伝播計算．このときに各層での出力値を保存するため，学習を行う場合には必ず次の順伝播計算の前にback_propagationを呼ぶこと
+
+        Parameters
+        ----------
+        inputs : numpy.matrix
+            入力値
+        """
         self.outputs = []
         self.outputs.append(inputs)
         for i in range(len(self.biases)):
@@ -35,12 +56,31 @@ class NeuralNetwork:
         return self.outputs[-1]
 
     def __calc_delta(self, prev_delta, layer_index):
+        """
+        前のデルタから次のデルタを計算する
+
+        Parameters
+        ----------
+        prev_delta : numpy.matrix
+            一つ前（出力層に近い）の層のデルタ
+        layer_index : int
+            計算を行っている層の位置
+        """
         return np.multiply(
             np.matmul(prev_delta, self.weights[layer_index + 1].T),
             differential_activation_func(self.outputs[layer_index + 1]),
         )
 
     def back_propagation(self, teach_data):
+        """
+        誤差逆伝播．教師信号をもとにweights，biasesを更新する．
+        self.outputsを利用して更新を行っているため，呼び出すタイミングに注意が必要．
+
+        Parameters
+        ----------
+        teach_data : numpy.matrix
+            教師信号
+        """
         layer_index = 1
         diff_err = self.outputs[-layer_index] - teach_data
         delta = np.matmul(
