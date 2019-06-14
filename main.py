@@ -21,7 +21,7 @@ def validate(nn, test_inputs, test_outputs):
 
 if __name__ == "__main__":
     learning_time_limit = 5000
-    error_boundary = 0.01
+    error_boundary = 0.1
     neuralnet = NeuralNetwork([2, 3, 1], 0.1, 1.0)
     for n in range(learning_time_limit):
         for data_no in range(len(teach_inputs)):

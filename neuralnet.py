@@ -2,14 +2,8 @@
 # Ref: https://qiita.com/haltaro/items/7639208417a751ad9bab
 ############################################################
 import numpy as np
-
-
-def sigmoid(x):
-    return 1.0 / (1.0 + np.exp(-x))
-
-
-def differential_sigmoid(y):
-    return np.multiply(y, (1.0 - y))
+from activation_funcs import sigmoid as activation_func
+from activation_funcs import differential_sigmoid as differential_activation_func
 
 
 class NeuralNetwork:
@@ -37,19 +31,21 @@ class NeuralNetwork:
         self.outputs.append(inputs)
         for i in range(len(self.biases)):
             layer_inputs = np.matmul(self.outputs[i], self.weights[i]) + self.biases[i]
-            self.outputs.append(sigmoid(layer_inputs))
+            self.outputs.append(activation_func(layer_inputs))
         return self.outputs[-1]
 
     def __calc_delta(self, prev_delta, layer_index):
         return np.multiply(
             np.matmul(prev_delta, self.weights[layer_index + 1].T),
-            differential_sigmoid(self.outputs[layer_index + 1]),
+            differential_activation_func(self.outputs[layer_index + 1]),
         )
 
     def back_propagation(self, teach_data):
         layer_index = 1
         diff_err = self.outputs[-layer_index] - teach_data
-        delta = np.matmul(diff_err, differential_sigmoid(self.outputs[-layer_index]))
+        delta = np.matmul(
+            diff_err, differential_activation_func(self.outputs[-layer_index])
+        )
         self.weights[-layer_index] -= self.learning_rate * np.matmul(
             self.outputs[-(layer_index + 1)].T, delta
         )
